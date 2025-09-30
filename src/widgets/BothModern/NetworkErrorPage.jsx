@@ -17,7 +17,7 @@ const NetworkErrorPage = ({ onRetry, onClose }) => {
   };
 
   return (
-    <div className="absolute inset-0 bg-blue-50 flex flex-col items-center justify-center text-center p-8 animate-in fade-in-50 duration-300">
+    <div className="absolute inset-0 bg-blue-50 flex flex-col z-999 items-center justify-center text-center p-8 animate-in fade-in-50 duration-300">
       {/* Network Icon */}
       <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
         <div className="relative">

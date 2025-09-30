@@ -130,7 +130,7 @@ const WidgetHeader = ({
               {actionText || "Welcome! We're here to help you with anything you need. Let's get started!"}
             </p>
               <p className="text-xs text-gray-300 flex items-center">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>
+                {/* <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span> */}
                 {isConnecting ? connectionStatus : "Online now"}
               </p>
             </div>

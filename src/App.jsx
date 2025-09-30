@@ -68,56 +68,110 @@ export default function ChatWidget({ widgetId }) {
   //   }
   // };
   // App.jsx
-  const handleFetchDetails = async () => {
-    try {
-      setLoading(true);
-      const details = await fetchUserDetails(widgetId);
+  // const handleFetchDetails = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const details = await fetchUserDetails(widgetId);
 
-      // If API responded with an error in payload
-      if (details?.error) {
-        throw {
-          type: 'general',
-          message: details.error,
-          status: details.status || 400
-        };
-      }
+  //     // If API responded with an error in payload
+  //     if (details?.error) {
+  //       throw {
+  //         type: 'general',
+  //         message: details.error,
+  //         status: details.status || 400
+  //       };
+  //     }
 
-      setUserDetails(details.widgetDetails);
-      setErrorTab(details.error_tab);
+  //     setUserDetails(details.widgetDetails);
+  //     setErrorTab(details.error_tab);
 
-      await trackWidgetDeployment(widgetId);
-      sendHeartbeat(widgetId);
-      setInterval(() => sendHeartbeat(widgetId), 24 * 60 * 60 * 1000); // daily
-    } catch (error) {
-      console.error("Error fetching widget details:", error);
+  //     await trackWidgetDeployment(widgetId);
+  //     sendHeartbeat(widgetId);
+  //     setInterval(() => sendHeartbeat(widgetId), 24 * 60 * 60 * 1000); // daily
+  //   } catch (error) {
+  //      console.error("Error fetching widget details:", error);
 
-      // Normalize error shape for ErrorHandler
-      let normalizedError = {
-        type: 'general',
-        message: 'Unable to fetch user details.'
+  // let normalizedError = {
+  //   type: 'general',
+  //   message: 'Unable to fetch user details.'
+  // };
+
+  // if (error?.status === 401 || error?.status === 403) {
+  //   normalizedError = {
+  //     type: 'unauthorized',
+  //     message: 'Widget not authorized for this domain',
+  //     status: error.status
+  //   };
+  // } else if (error instanceof TypeError && error.message == "Failed to fetch") {
+  //   // Covers ERR_CONNECTION_REFUSED and other fetch-level network issues
+  //   console.log("network issuess");
+  //   normalizedError = {
+  //     type: 'network',
+  //     message: 'Connection failed',
+  //     code: 'NETWORK_ERROR'
+  //   };
+  // } else if (error?.message?.includes("Network")) {
+  //   normalizedError = {
+  //     type: 'network',
+  //     message: 'Connection failed',
+  //     code: 'NETWORK_ERROR'
+  //   };
+  // } else if (error?.message) {
+  //   normalizedError.message = error.message;
+  // }
+
+  //     setCurrentError(normalizedError);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+const handleFetchDetails = async () => {
+  try {
+    setLoading(true);
+    const details = await fetchUserDetails(widgetId);
+
+    // If API responded with an error in payload
+    if (details?.error) {
+      throw {
+        type: details.type || 'general',
+        message: details.error,  // Now always a string
+        status: details.status || 400
       };
-
-      if (error?.status === 401 || error?.status === 403) {
-        normalizedError = {
-          type: 'unauthorized',
-          message: 'Widget not authorized for this domain',
-          status: error.status
-        };
-      } else if (error?.code === 'NETWORK_ERROR' || error?.message?.includes("Network")) {
-        normalizedError = {
-          type: 'network',
-          message: 'Connection failed',
-          code: 'NETWORK_ERROR'
-        };
-      } else if (error?.message) {
-        normalizedError.message = error.message;
-      }
-
-      setCurrentError(normalizedError);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    setUserDetails(details.widgetDetails || {});  // Fallback to empty if undefined
+    setErrorTab(details.error_tab || false);
+
+    await trackWidgetDeployment(widgetId);
+    sendHeartbeat(widgetId);
+    setInterval(() => sendHeartbeat(widgetId), 24 * 60 * 60 * 1000); // daily
+  } catch (error) {
+    console.error(`Error fetching widget details for widgetId ${widgetId}:`, error);
+
+    let normalizedError = {
+      type: error.type || 'general',
+      message: error.message || 'Unable to fetch user details.',
+      status: error.status
+    };
+
+    // No need for instanceof TypeError check here, as it's handled in fetchUserDetails
+    // Override for unauthorized if status indicates
+    if (error.status === 401 || error.status === 403) {
+      normalizedError.type = 'unauthorized';
+      normalizedError.message = 'Widget not authorized for this domain';
+    }
+    // For network, use the pre-set type
+    if (normalizedError.type === 'network') {
+      normalizedError.code = 'NETWORK_ERROR';
+    }
+
+    setCurrentError(normalizedError);
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   const handleRetry = async () => {

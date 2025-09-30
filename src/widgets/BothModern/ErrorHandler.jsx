@@ -48,6 +48,15 @@ const ErrorHandler = ({
           onClose={onClose}
         />
       );
+
+      case 'general':
+        return (
+       <ErrorPage 
+          errorMessage={error.message || error.toString()}
+          onRetry={onRetry}
+          onClose={onClose}
+        />
+      );
       
     default:
       return (
