@@ -20,11 +20,11 @@
 //   }
 // }
 
-
+import { API_BASE_URL } from "./url_config";
 // ---- API Helpers ----
 export async function fetchUserDetails(widgetId) {
   try {
-    const response = await fetch(`http://localhost:8001/api/loadWidget/${widgetId}`);
+    const response = await fetch(`${API_BASE_URL}/api/loadWidget/${widgetId}`);
     
     if (!response.ok) {
       let data;

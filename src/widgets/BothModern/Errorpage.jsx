@@ -87,7 +87,7 @@ const ErrorPage = ({
       {/* Powered By */}
       <div className="absolute bottom-4 w-full">
         <p className="text-center text-xs text-gray-400">
-          Powered by <span className="text-orange-500 font-semibold">Bucxai</span>
+          Powered by <span className="text-black font-semibold">Calmflo</span>
         </p>
       </div>
     </div>

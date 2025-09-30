@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, AlertCircle, Lock, RefreshCw, ExternalLink, Home } from 'lucide-react';
+import { API_BASE_URL } from '../../utils/url_config';
 
 // Unauthorized Access Page Component
 const UnauthorizedPage = ({ 
@@ -51,7 +52,7 @@ const UnauthorizedPage = ({
       {/* Action Buttons */}
       <div className="space-y-3 w-full max-w-xs">
         <a 
-          href="https://bucxai.com/signup" 
+          href={`${API_BASE_URL}/signup`} 
           target="_blank" 
           rel="noopener noreferrer"
           className="block w-full bg-gray-900 hover:bg-gray-800 text-white py-3 px-6 rounded-full shadow-lg font-medium transition-all duration-200 hover:transform hover:scale-105"
@@ -78,7 +79,7 @@ const UnauthorizedPage = ({
         </button>
 
         <a 
-          href="https://bucxai.com/docs/widget-setup" 
+          href={`${API_BASE_URL}/docs/widget-setup`} 
           target="_blank" 
           rel="noopener noreferrer"
           className="block w-full text-gray-600 hover:text-gray-700 text-sm font-medium py-2 transition-colors flex items-center justify-center space-x-1 hover:underline"
@@ -101,7 +102,7 @@ const UnauthorizedPage = ({
       {/* Powered By */}
       <div className="absolute bottom-4 w-full">
         <p className="text-center text-xs text-gray-400">
-          Powered by <span className="text-orange-500 font-semibold">Bucxai</span>
+          Powered by <span className="text-black font-semibold">Calmflo</span>
         </p>
       </div>
     </div>

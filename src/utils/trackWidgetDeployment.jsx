@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./url_config";
+
 export async function trackWidgetDeployment(widgetId) {
   const domain = window.location.hostname;
   const url = window.location.href;
@@ -6,7 +8,7 @@ export async function trackWidgetDeployment(widgetId) {
   if (localStorage.getItem(key)) return;
 
   try {
-    const response = await fetch(`http://localhost:8001/api/widget_deployment`, {
+    const response = await fetch(`${API_BASE_URL}/api/widget_deployment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ widget_id: widgetId, domain, url }),
