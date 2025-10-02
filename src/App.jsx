@@ -120,6 +120,9 @@ const saveWidgetClick = async (widgetId, visitorId) => {
     });
   };
 
+  console.log("API_BASE_URL:", API_BASE_URL);
+console.log("ENV:", import.meta.env);
+
   return (
     <>
       <BothModernWidget

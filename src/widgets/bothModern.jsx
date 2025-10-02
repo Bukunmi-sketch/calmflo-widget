@@ -1987,6 +1987,11 @@ const BothModernWidget = ({
   const [isLiveChatConnected, setIsLiveChatConnected] = useState(false);
   const [showAcceptedModal, setShowAcceptedModal] = useState(false);
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
+const toggleExpand = () => setIsExpanded((prev) => !prev);
+
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -2429,13 +2434,27 @@ const BothModernWidget = ({
       />
 
       {isOpen && (
+        // <div
+        //   className="fixed bottom-5 right-5 bg-white rounded-2xl shadow-2xl text-sm z-50 overflow-hidden transition-all duration-300 transform animate-in slide-in-from-bottom-5 flex flex-col"
+        //   style={{
+        //     width: '384px',
+        //     height: window.innerWidth < 768 ? '600px' : '700px',
+        //     maxHeight: '90vh'
+        //   }}>
         <div
-          className="fixed bottom-5 right-5 bg-white rounded-2xl shadow-2xl text-sm z-50 overflow-hidden transition-all duration-300 transform animate-in slide-in-from-bottom-5 flex flex-col"
-          style={{
-            width: '384px',
-            height: window.innerWidth < 768 ? '600px' : '700px',
-            maxHeight: '90vh'
-          }}>
+  className="fixed bottom-5 right-5 bg-white rounded-2xl shadow-2xl text-sm z-50 overflow-hidden transition-all duration-300 transform animate-in slide-in-from-bottom-5 flex flex-col"
+  style={{
+    // width: isExpanded ? "70vw" : "384px",
+    width: isExpanded 
+  ? (window.innerWidth < 768 ? "95vw" : "30vw") 
+  : "384px",
+
+    height: isExpanded ? "90vh" : (window.innerWidth < 768 ? "600px" : "700px"),
+    maxHeight: "95vh",
+    maxWidth: "95vw",
+  }}
+>
+
 
           {error && (
             <ErrorHandler
@@ -2467,6 +2486,8 @@ const BothModernWidget = ({
                   messages={messages}
                   actionText={actionText}
                   isReceiverUserOnline={isReceiverUserOnline}
+                  toggleExpand={toggleExpand}
+                  isExpanded={isExpanded}
                 />
               )}
 

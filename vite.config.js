@@ -92,7 +92,11 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
+
 export default defineConfig(({ command }) => {
+
+  console.log("Loaded ENV:", process.env);
+
   if (command === "serve") {
     // DEV: run normal React app with index.html
     return {

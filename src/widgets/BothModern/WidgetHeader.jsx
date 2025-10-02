@@ -2,6 +2,7 @@ import { MessageCircle, FileText, X, Send, ChevronDown, Home, User, MoreHorizont
 import { useState,useEffect } from "react";
 import RatingModal from "./ratingModal";
 import SendTranscriptModal from "./TranscriptModal";
+import { Maximize2, Minimize2 } from "lucide-react"; // icons
 
 // const WidgetHeader = ({ formData, isConnecting, connectionStatus, showSettings, setShowSettings, setShowTicketForm, toggleChat, messages = [] }) => {
 
@@ -99,7 +100,9 @@ const WidgetHeader = ({
   toggleChat,
   actionText,
   messages = [], // Add messages prop
-  isReceiverUserOnline
+  isReceiverUserOnline,
+  toggleExpand,
+  isExpanded
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showTranscriptModal, setShowTranscriptModal] = useState(false);
@@ -122,7 +125,7 @@ const WidgetHeader = ({
             {formData?.allowWidgetDisplayPicture && formData?.widget_image && (
               <div className="relative">
                 <img src={formData?.widget_image} alt="Assistant" className="w-10 h-10 rounded-full border-2 border-white/20" />
-                <div className={`absolute -bottom-1 -right-1 w-3 h-3 ${isReceiverUserOnline ? `bg-green-500` : `bg-gray-400`} rounded-full border border-gray-900`}></div>
+                <div className={`absolute -bottom-1 -right-1 w-2 h-2 ${isReceiverUserOnline ? `bg-green-500` : `bg-gray-400`} rounded-full border border-transparent`}></div>
               </div>
             )}
             <div>
@@ -130,7 +133,7 @@ const WidgetHeader = ({
                <p className="text-gray-700 text-sm leading-relaxed max-w-sm">
               {actionText || "Welcome! We're here to help you with anything you need. Let's get started!"}
             </p>
-              <p className="text-xs text-gray-300 flex items-center">
+              <p className="text-xs text-gray-500 flex items-center">
                 {/* <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span> */}
                 {isConnecting ? connectionStatus : ""}
               </p>
@@ -138,8 +141,16 @@ const WidgetHeader = ({
             </div>
           </div>
           <div className="flex items-center space-x-2">
+             {/* Expand/Collapse */}
+          <button
+            onClick={toggleExpand}
+            className="text-gray-900 hover:text-black transition-colors p-2 rounded-full hover:bg-gray-200"
+          >
+            {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+          </button>
+
             <div className="relative">
-              <button onClick={() => setShowSettings(!showSettings)} className="text-gray-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full" >
+              <button onClick={() => setShowSettings(!showSettings)} className="text-gray-900 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full" >
                 <MoreHorizontal className="w-5 h-5" />
               </button>
               
@@ -162,7 +173,7 @@ const WidgetHeader = ({
                 </div>
               )}
             </div>
-            <button onClick={toggleChat} className="text-gray-300 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full" > <X className="w-5 h-5" /> </button>
+            <button onClick={toggleChat} className="text-gray-900 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full" > <X className="w-5 h-5" /> </button>
           </div>
         </div>
       </div>
