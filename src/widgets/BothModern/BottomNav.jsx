@@ -12,7 +12,7 @@ const BottomNav = ({ formData, activeTab, switchTab }) => {
               <button
                 onClick={() => switchTab("home")}
                 className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                  activeTab === "home" ? "bg-gray-900 text-white shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  activeTab === "home" ? "bg-gray-100 text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 {!formData?.HideTabIcon && <Home className="w-5 h-5 mb-1" />}
@@ -25,7 +25,7 @@ const BottomNav = ({ formData, activeTab, switchTab }) => {
               <button
                 onClick={() => switchTab("chat")}
                 className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                  activeTab === "chat" ? "bg-gray-900 text-white shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  activeTab === "chat" ? "bg-gray-100 text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 {!formData?.HideTabIcon && <MessageCircle className="w-5 h-5 mb-1" />}
@@ -38,7 +38,7 @@ const BottomNav = ({ formData, activeTab, switchTab }) => {
               <button
                 onClick={() => switchTab("livechat")}
                 className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 ${
-                  activeTab === "livechat" ? "bg-gray-900 text-white shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  activeTab === "livechat" ? "bg-gray-100 text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 {!formData?.HideTabIcon && <User className="w-5 h-5 mb-1" />}

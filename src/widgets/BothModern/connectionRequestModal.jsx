@@ -1,13 +1,13 @@
 // ConnectionRequestModal Component
 import { MessageCircle, FileText, X, Send, ChevronDown, Home, User, MoreHorizontal, Star, Globe, Loader2, Upload, Phone, Mail } from "lucide-react";
 
-const ConnectionRequestModal = ({ showConnectionModal, setShowConnectionModal, connectionForm, setConnectionForm, handleConnectionRequest }) => {
+const ConnectionRequestModal = ({ showConnectionModal, setShowConnectionModal, connectionForm, setConnectionForm, handleConnectionRequestButton }) => {
   return (
     <>
       {showConnectionModal && (
-        <div className="inset-0 bg-black bg-opacity-50 z-[60] flex items-center absolute justify-center p-4">
+         <div className="absolute inset-0 bg-white/30 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform animate-in slide-in-from-bottom-5">
-            <div className="bg-gray-900 text-white p-6 rounded-t-2xl">
+            <div className="bg-gray-100 text-gray-900 p-6 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Connect with Agent</h2>
                 <button onClick={() => setShowConnectionModal(false)} className="text-gray-300 hover:text-white">
@@ -16,7 +16,7 @@ const ConnectionRequestModal = ({ showConnectionModal, setShowConnectionModal, c
               </div>
               <p className="text-gray-300 text-sm mt-2">Fill out the form to connect with a live agent</p>
             </div>
-            <form onSubmit={handleConnectionRequest} className="p-6 space-y-4">
+            <form onSubmit={handleConnectionRequestButton} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
                 <input
@@ -52,7 +52,7 @@ const ConnectionRequestModal = ({ showConnectionModal, setShowConnectionModal, c
               </div>
               <button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-full font-medium transition-colors"
               >
                 Send Request
               </button>

@@ -2,7 +2,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import ChatWidget from "./App";
-import widgetStyles from "./index.css?inline"; // ⬅️ Import Tailwind CSS as raw text
+import widgetStyles from "./index.css?inline"; //  Import Tailwind CSS as raw text
 
 function initChatWidget(widgetId) {
   let container = document.getElementById("chat-widget-container");

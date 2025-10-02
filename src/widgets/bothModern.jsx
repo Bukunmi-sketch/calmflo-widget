@@ -1912,6 +1912,8 @@ import LoadingModal from "./BothModern/LoadingModal";
 import PoweredBy from "./BothModern/poweredBy";
 import ErrorHandler from "./BothModern/ErrorHandler";
 import AcceptedModal from "./BothModern/AcceptedModal";
+import useWebSocket from "../hooks/useWebSocket";
+
 
 
 
@@ -1967,12 +1969,15 @@ const BothModernWidget = ({
   error = null, // New prop for error handling
   loading = false,   // 👈 add loader prop
   onRetryConnection,
+  userDetails,
+  visitorId,
+  leadDataExists
 }) => {
   const [activeTab, setActiveTab] = useState("home");
   const [visible, setVisible] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showLeadsForm, setShowLeadsForm] = useState(false);
+  const [showLeadsForm, setShowLeadsForm] = useState(true);
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
@@ -2033,6 +2038,113 @@ const BothModernWidget = ({
   ];
 
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState(0);
+
+  const [isChatEnabled, setIsChatEnabled] = useState(false);
+  const [showRejectedModal, setShowRejectedModal] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const widgetName = userDetails?.name || formData.name;
+
+  // Use the WebSocket hook
+  
+  const { isReceiverUserOnline, isRequestConnecting, sendWebSocketMessage, handleConnectionRequest, stopConnectionAttempt, } =  //receiving
+    useWebSocket({ widgetId,userDetails,isOpen,
+    // onOnlineStatus: (status) => {
+    //   setIsReceiverUserOnline(status);
+    //   // Update connectionStatus or other UI if needed
+    // }, 
+    onConnectionAccepted: () => {
+      setIsChatEnabled(true);
+      setIsLiveChatConnected(true);
+      setShowAcceptedModal(true);
+      setShowLoadingModal(false);
+      setIsConnecting(false);
+      setConnectionStatus("");
+    },
+    onRejection: () => {
+      setIsChatEnabled(false);
+      setShowRejectedModal(true);
+      setShowLoadingModal(false);
+      setIsConnecting(false);
+      setConnectionStatus("");
+    },
+    onIncomingMessage: (newMsg) => {
+      setIsChatEnabled(true);
+      setLiveMessages((prev) => [...prev, newMsg]);
+    },
+    onTyping: (isTyping) => setIsAgentTyping(isTyping),
+    onError: () => {
+      setShowConnectionFailedModal(true);
+      setShowLoadingModal(false);
+      setIsConnecting(false);
+      setConnectionStatus("");
+    },
+    onConnecting: (isConnecting) => {
+      setIsConnecting(isConnecting);
+      setConnectionStatus(isConnecting ? "Connecting..." : "");
+    },
+    visitorId
+  });
+
+  // Utility functions (localStorage, etc.) - move to a utils file if shared
+  const getCookieValue = (name) => {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return cookie.substring(name.length + 1);
+      }
+    }
+    return null;
+  };
+
+  const cleanUpData = (data) => {
+    return data.map(entry => {
+      return {
+        id: entry.id === "null" ? null : entry.id,
+        type: entry.type,
+        message: entry.message
+      };
+    });
+  };
+
+  const setLocalStorageWithExpiry = (key, value, ttl) => {
+    const now = new Date();
+    const item = {
+      value,
+      expiry: now.getTime() + ttl,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  };
+
+  const getLocalStorageWithExpiry = (key) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) return null;
+
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return item.value;
+  };
+
+  const saveLiveChatToLocalStorage = () => {
+    const chatData = liveMessages.map(msg => ({
+      id: msg.id === "null" ? null : msg.id,
+      type: msg.sender === "user" ? "sender" : "receiver",
+      message: msg.text
+    }));
+    const sixtyDaysInMilliseconds = 60 * 24 * 60 * 60 * 1000;
+    setLocalStorageWithExpiry("livechatData", cleanUpData(chatData), sixtyDaysInMilliseconds);
+  };
+
+  useEffect(() => {
+    saveLiveChatToLocalStorage();
+  }, [liveMessages]);
 
   const switchTab = (tab) => {
     setActiveTab(tab);
@@ -2128,6 +2240,35 @@ const BothModernWidget = ({
     }
   };
 
+  // const handleSendLiveMessage = () => {
+  //   if (newLiveMessage.trim() && isChatEnabled) {
+  //     const userMessage = {
+  //       id: liveMessages.length + 1,
+  //       text: newLiveMessage,
+  //       sender: "user",
+  //       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  //     };
+
+  //     setLiveMessages([...liveMessages, userMessage]);
+  //     sendWebSocketMessage({
+  //       from_user: userDetails?.user_id || 'visitor',
+  //       to_user: userDetails?.receiver_id || 'agent',
+  //       message_text: newLiveMessage
+  //     });
+  //     setNewLiveMessage("");
+  //   }
+  // };
+
+  useEffect(() => {
+    if (newLiveMessage.trim() && isChatEnabled) {
+      sendWebSocketMessage({
+        from_user: userDetails?.user_id || 'visitor',
+        to_user: userDetails?.receiver_id || 'agent',
+        typing: true
+      });
+    }
+  }, [newLiveMessage, sendWebSocketMessage, isChatEnabled]);
+
   const handleLiveKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -2142,15 +2283,17 @@ const BothModernWidget = ({
     }
   };
 
-  const handleLeadsFormSubmit = (e) => {
-    e.preventDefault();
-    // Process leads form
-    console.log("Leads form submitted:", leadsForm);
-    setShowLeadsForm(false);
-    setLeadsForm({ fullname: "", email: "", message: "" });
-    // Show success message
-    alert("Thank you! We'll get back to you soon.");
-  };
+  // const handleLeadsFormSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Process leads form
+  //   console.log("Leads form submitted:", leadsForm);
+  //   setShowLeadsForm(false);
+  //   setLeadsForm({ fullname: "", email: "", message: "" });
+  //   // Show success message
+  //   alert("Thank you! We'll get back to you soon.");
+  // };
+
+  
 
   const handleTicketFormSubmit = (e) => {
     e.preventDefault();
@@ -2179,12 +2322,13 @@ const BothModernWidget = ({
   //   window.connectionTimer = connectionTimer;
   // };
 
-  const handleConnectionRequest = (e) => {
+  const handleConnectionRequestButton = (e) => {
     e.preventDefault();
     setShowConnectionModal(false);
     setShowLoadingModal(true);
     setIsConnecting(true);
     setConnectionStatus("Connecting...");
+    handleConnectionRequest(connectionForm);
 
     // Simulate successful connection after 3 seconds
     const connectionTimer = setTimeout(() => {
@@ -2233,6 +2377,45 @@ const BothModernWidget = ({
     setIsRetrying(false);
   };
 
+  // New RejectedModal (similar to AcceptedModal)
+  const RejectedModal = () => {
+    if (!showRejectedModal) return null;
+    return (
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+        <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+          <h3 className="text-lg font-bold mb-2">Connection Rejected</h3>
+          <p className="text-gray-600 mb-4"><b>{widgetName}</b> rejected your request.</p>
+          <button
+            onClick={() => setShowRejectedModal(false)}
+            className="bg-gray-900 text-white px-4 py-2 rounded-lg w-full"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Image Preview Modal
+  const ImagePreviewModal = () => {
+    if (!previewImage) return null;
+    return (
+       <div className="absolute inset-0 bg-white/30 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+        <div className="relative">
+          <img src={previewImage} alt="Preview" className="max-w-full max-h-screen rounded-lg" />
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-2 right-2 text-white bg-gray-800 p-2 rounded-full"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  console.log('leads',leadDataExists);
+
   return (
     <div className="fixed bottom-5 right-5 z-50 font-sans">
       <PopupAnimation visible={visible} formData={formData} setVisible={setVisible} />
@@ -2245,7 +2428,7 @@ const BothModernWidget = ({
         statusBubbleText={statusBubbleText}
       />
 
-      {isOpen && ( 
+      {isOpen && (
         <div
           className="fixed bottom-5 right-5 bg-white rounded-2xl shadow-2xl text-sm z-50 overflow-hidden transition-all duration-300 transform animate-in slide-in-from-bottom-5 flex flex-col"
           style={{
@@ -2283,6 +2466,7 @@ const BothModernWidget = ({
                   toggleChat={toggleChat}
                   messages={messages}
                   actionText={actionText}
+                  isReceiverUserOnline={isReceiverUserOnline}
                 />
               )}
 
@@ -2321,7 +2505,11 @@ const BothModernWidget = ({
                     handleLiveKeyPress={handleLiveKeyPress}
                     switchTab={switchTab}
                     setShowConnectionModal={setShowConnectionModal}
+                    setShowConnectionFailedModal={setShowConnectionFailedModal}
                     isLiveChatConnected={isLiveChatConnected}
+                    isChatEnabled={isChatEnabled}
+                    setPreviewImage={setPreviewImage}
+                    isReceiverUserOnline={isReceiverUserOnline}
                   />
                 )}
               </div>
@@ -2336,11 +2524,15 @@ const BothModernWidget = ({
 
 
               <LeadsFormModal
+                leadDataExists={leadDataExists}
+                userDetails={userDetails}
                 showLeadsForm={showLeadsForm}
                 setShowLeadsForm={setShowLeadsForm}
                 leadsForm={leadsForm}
                 setLeadsForm={setLeadsForm}
-                handleLeadsFormSubmit={handleLeadsFormSubmit}
+                visitorId={visitorId}
+                widgetId={widgetId}
+                // handleLeadsFormSubmit={handleLeadsFormSubmit}
               />
 
               <TicketFormModal
@@ -2357,7 +2549,7 @@ const BothModernWidget = ({
                 setShowConnectionModal={setShowConnectionModal}
                 connectionForm={connectionForm}
                 setConnectionForm={setConnectionForm}
-                handleConnectionRequest={handleConnectionRequest}
+                handleConnectionRequestButton={handleConnectionRequestButton}
               />
 
               <LoadingModal
@@ -2381,6 +2573,8 @@ const BothModernWidget = ({
                 switchTab={switchTab}
               />
 
+              <RejectedModal />
+              <ImagePreviewModal />
 
 
             </>

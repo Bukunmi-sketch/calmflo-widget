@@ -40,7 +40,7 @@ const HomeTab = ({ formData, actionText, switchTab, setShowLeadsForm }) => {
           </div>
           <button
             onClick={() => switchTab("chat")}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 px-4 rounded-full flex items-center justify-center space-x-2 transition-colors"
           >
             <span>Send us a message</span>
             <Send className="w-4 h-4" />

@@ -70,7 +70,7 @@ const ErrorPage = ({
           className="block w-full text-blue-600 hover:text-blue-700 text-sm font-medium py-2 transition-colors flex items-center justify-center space-x-1 hover:underline"
         >
           <ExternalLink className="w-4 h-4" />
-          <span>Visit Bucxai for assistance</span>
+          <span>Visit Calmflo for assistance</span>
         </a>
       </div>
 

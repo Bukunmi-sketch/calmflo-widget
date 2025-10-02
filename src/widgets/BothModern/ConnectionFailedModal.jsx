@@ -50,7 +50,7 @@ const ConnectionFailedModal = ({
   if (!showConnectionFailedModal) return null;
 
   return (
-    <div className="absolute inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+     <div className="absolute inset-0 bg-white/30 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform animate-in slide-in-from-bottom-5">
         <div className="p-6">
           {/* Header */}

@@ -13,8 +13,12 @@ const LivechatTab = ({
   handleSendLiveMessage,
   handleLiveKeyPress,
   switchTab,
+  setShowConnectionFailedModal,
   setShowConnectionModal,
-  isLiveChatConnected
+  isLiveChatConnected,
+  isChatEnabled,
+  setPreviewImage,
+  isReceiverUserOnline
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesRef = useRef(null);
@@ -58,13 +62,20 @@ const LivechatTab = ({
   if (!isLiveChatConnected) {
     return (
       <div className="h-full flex flex-col">
-        <div className="flex items-center p-3 border-b border-gray-200 bg-white">
-          <button onClick={() => switchTab("home")} className="p-2 mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full" >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h2 className="text-sm font-semibold text-gray-800">
-            {formData?.LivechatTabLabel || "Support"}
-          </h2>
+        <div className="flex flex-col justify-start items-center w-full p-3 border-b border-gray-200 bg-white">
+          <div className="flex w-full items-center">
+            <button onClick={() => switchTab("home")} className="p-2 mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full" >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h2 className="text-sm font-semibold text-gray-800">
+              {formData?.LivechatTabLabel || "Support"}
+            </h2>
+          </div>
+          <div className="flex items-center  justify-start px-10 gap-1 w-full">
+            <div className={` w-2 h-2 ${isReceiverUserOnline ? `bg-green-500` : `bg-gray-400`} rounded-full border border-transparent`}></div>
+            <p className="text-black">{isReceiverUserOnline ? "Online now" : "Offline"}</p>
+          </div>
+
         </div>
 
         <div className="flex-1 p-4 flex items-center justify-center">
@@ -76,8 +87,13 @@ const LivechatTab = ({
               <h3 className="font-semibold text-gray-800 mb-2">Live Chat Support</h3>
               <p className="text-sm text-gray-600 mb-4">{formData?.LivechatInitialMessage}</p>
               <p className="text-xs text-gray-500 mb-4">{formData?.ConnectionRequestQuestion}</p>
+              {/* setShowConnectionFailedModal help me use tetinary condtion that if the isReceiverUserOnline  is true , use setShowConnectionModal else call the function setShowConnectionFailedModal(treu) */}
               <button
-                onClick={() => setShowConnectionModal(true)}
+                onClick={() =>
+    isReceiverUserOnline
+      ? setShowConnectionModal(true)
+      : setShowConnectionFailedModal(true)
+  }
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full text-sm transition-colors flex items-center space-x-2 mx-auto"
               >
                 <Phone className="w-4 h-4" />
@@ -94,13 +110,19 @@ const LivechatTab = ({
   return (
     <div className="flex flex-col h-full">
       {/* Header with Back + Label */}
-      <div className="flex items-center p-3 border-b border-gray-200 bg-white">
+       <div className="flex flex-col justify-start items-center w-full p-3 border-b border-gray-200 bg-white">
+          <div className="flex w-full items-center">
         <button onClick={() => switchTab("home")} className="p-2 mr-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full" >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h2 className="text-sm font-semibold text-gray-800">
           {formData?.LivechatTabLabel || "Live Chat"}
         </h2>
+        </div>
+         <div className="flex items-center  justify-start px-10 gap-1 w-full">
+            <div className={` w-2 h-2 ${isReceiverUserOnline ? `bg-green-500` : `bg-gray-400`} rounded-full border border-transparent`}></div>
+            <p className="text-black">{isReceiverUserOnline ? "Online now" : "Offline"}</p>
+          </div>
       </div>
 
       {/* Messages Area */}
@@ -108,22 +130,19 @@ const LivechatTab = ({
         {liveMessages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${
-              message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"
+              }`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-2xl ${
-                message.sender === "user"
+              className={`max-w-xs px-4 py-2 rounded-2xl ${message.sender === "user"
                   ? "bg-gray-900 text-white rounded-br-md"
                   : "bg-gray-100 text-gray-800 rounded-bl-md"
-              }`}
+                }`}
             >
               <p className="text-sm">{message.text}</p>
               <p
-                className={`text-xs mt-1 ${
-                  message.sender === "user" ? "text-gray-300" : "text-gray-500"
-                }`}
+                className={`text-xs mt-1 ${message.sender === "user" ? "text-gray-300" : "text-gray-500"
+                  }`}
               >
                 {message.timestamp}
               </p>
@@ -189,7 +208,7 @@ const LivechatTab = ({
           </div>
         )}
       </div>
-      <PoweredBy/>
+      <PoweredBy />
     </div>
   );
 };

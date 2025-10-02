@@ -98,7 +98,8 @@ const WidgetHeader = ({
   setShowTicketForm, 
   toggleChat,
   actionText,
-  messages = [] // Add messages prop
+  messages = [], // Add messages prop
+  isReceiverUserOnline
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showTranscriptModal, setShowTranscriptModal] = useState(false);
@@ -115,24 +116,25 @@ const WidgetHeader = ({
 
   return (
     <>
-      <div className="bg-black text-white p-6 rounded-t-2xl relative">
+      <div className="bg-gray-100 text-gray-900 p-6 rounded-t-2xl relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {formData?.allowWidgetDisplayPicture && formData?.widget_image && (
               <div className="relative">
                 <img src={formData?.widget_image} alt="Assistant" className="w-10 h-10 rounded-full border-2 border-white/20" />
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-gray-900"></div>
+                <div className={`absolute -bottom-1 -right-1 w-3 h-3 ${isReceiverUserOnline ? `bg-green-500` : `bg-gray-400`} rounded-full border border-gray-900`}></div>
               </div>
             )}
             <div>
               <h2 className=" text-2xl font-bold mb-1">{formData?.name || 'Assistant'}</h2>
-               <p className="text-gray-300 text-sm leading-relaxed max-w-sm">
+               <p className="text-gray-700 text-sm leading-relaxed max-w-sm">
               {actionText || "Welcome! We're here to help you with anything you need. Let's get started!"}
             </p>
               <p className="text-xs text-gray-300 flex items-center">
                 {/* <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span> */}
-                {isConnecting ? connectionStatus : "Online now"}
+                {isConnecting ? connectionStatus : ""}
               </p>
+              <p>{isReceiverUserOnline ? "Online now" : "Offline" }</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
